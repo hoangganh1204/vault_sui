@@ -1,5 +1,6 @@
 import { loadKeypair } from '../adapters/sui.js';
-import { getVaultEntries } from '../adapters/registry.js';
+import { getVaultEntries, saveRegistry } from '../adapters/registry.js';
+import { listOwnedManifests } from '../adapters/walrus.js';
 import type { VaultEntry } from '../adapters/registry.js';
 import { getAddress } from '../core/wallet.js';
 import { formatBytes } from '../utils/format.js';
@@ -39,7 +40,37 @@ export async function listCommand(options: ListOptions): Promise<ListResult> {
   const keypair = loadKeypair(options.walletKey);
   const walletAddress = getAddress(keypair);
 
-  const vaults = await getVaultEntries(walletAddress);
+  let vaults = await getVaultEntries(walletAddress);
+
+  // On-chain recovery when local registry is empty
+  if (vaults.length === 0) {
+    const spin = logger.spinner('Scanning chain for vaults...');
+    try {
+      const recovered = await listOwnedManifests(walletAddress);
+      if (recovered.length > 0) {
+        vaults = recovered.map(({ manifest, manifestBlobId }) => ({
+          vaultId: manifest.vaultId,
+          fileName: manifest.fileName,
+          fileSize: manifest.fileSize,
+          blobId: manifest.blobId,
+          manifestBlobId,
+          ownerAddress: manifest.ownerAddress,
+          createdAt: manifest.createdAt,
+          expiresAt: new Date(
+            new Date(manifest.createdAt).getTime() + 86400000 * 30 * manifest.epochs
+          ).toISOString(),
+          status: 'active' as const,
+        }));
+        await saveRegistry({ version: 1, walletAddress, vaults });
+        spin.succeed(`Recovered ${vaults.length} vault(s) from chain`);
+      } else {
+        spin.stop();
+      }
+    } catch {
+      spin.stop();
+    }
+  }
+
   const rows = buildRows(vaults);
   const isEmpty = vaults.length === 0;
 

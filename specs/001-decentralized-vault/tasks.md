@@ -147,7 +147,7 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T028 [P] [US4] Write verify command tests in tests/commands/verify.test.ts:
+- [X] T028 [P] [US4] Write verify command tests in tests/commands/verify.test.ts:
   - Happy path: verify existing vault → displays "healthy" with metadata (size, created, expires)
   - Error: blob unavailable on Walrus → displays "corrupted" with E012
   - Error: vault not found in registry → throws VaultSuiError E007
@@ -155,8 +155,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T029 [US4] Implement verify command handler in src/commands/verify.ts: validate inputs (vaultId format, wallet configured) → look up vault in registry → fetchBlob (manifest) → parseManifest/validateManifest → attempt fetchBlob (data, head-only or small read) → if success: "healthy" with metadata; if fail: "corrupted" with E012 → output via logger
-- [ ] T030 [US4] Wire verify command into CLI in src/index.ts: `program.command("verify <vault-id>")` per cli-commands.md contract
+- [X] T029 [US4] Implement verify command handler in src/commands/verify.ts: validate inputs (vaultId format, wallet configured) → look up vault in registry → fetchBlob (manifest) → parseManifest/validateManifest → attempt fetchBlob (data, head-only or small read) → if success: "healthy" with metadata; if fail: "corrupted" with E012 → output via logger
+- [X] T030 [US4] Wire verify command into CLI in src/index.ts: `program.command("verify <vault-id>")` per cli-commands.md contract
 
 **Checkpoint**: `vault-sui verify v_XXXXXX` should report vault health in < 5 seconds.
 
@@ -172,13 +172,13 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T031 [P] [US5] Write portability tests in tests/commands/list.test.ts (extend existing):
+- [X] T031 [P] [US5] Write portability tests in tests/commands/list.test.ts (extend existing):
   - Happy path: empty local registry + wallet with on-chain vaults → list recovers and displays all vaults
   - Error: wallet with no on-chain vaults → displays empty list
 
 ### Implementation for User Story 5
 
-- [ ] T032 [US5] Implement on-chain vault recovery: when local registry is empty or missing, query Walrus/Sui for manifests associated with the current wallet address, parse each manifest, rebuild local registry, then display results in src/commands/list.ts and src/adapters/walrus.ts
+- [X] T032 [US5] Implement on-chain vault recovery: when local registry is empty or missing, query Walrus/Sui for manifests associated with the current wallet address, parse each manifest, rebuild local registry, then display results in src/commands/list.ts and src/adapters/walrus.ts
 
 **Checkpoint**: Fresh install + same wallet → `vault-sui list` recovers all vaults in < 30 seconds.
 

@@ -3,6 +3,8 @@ import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
 import type { Signer } from '@mysten/sui/cryptography';
 import { withRetry } from '../utils/retry.js';
 import { VaultSuiError, ERROR_CODES } from '../utils/errors.js';
+import { parseManifest } from '../core/manifest.js';
+import type { Manifest } from '../core/manifest.js';
 
 const NETWORK_RPC_URLS: Record<string, string> = {
   testnet: 'https://fullnode.testnet.sui.io:443',
@@ -54,4 +56,81 @@ export async function fetchBlob(blobId: string): Promise<Buffer> {
       'The blob may have expired or the network may be unavailable'
     );
   }
+}
+
+export interface RecoveredVault {
+  manifest: Manifest;
+  manifestBlobId: string;
+}
+
+/**
+ * Query Sui transaction history for this wallet to discover vault manifests uploaded to Walrus.
+ * Used for registry recovery on a new machine with the same wallet.
+ */
+export async function listOwnedManifests(walletAddress: string): Promise<RecoveredVault[]> {
+  const network = getNetwork();
+  const url = NETWORK_RPC_URLS[network] ?? NETWORK_RPC_URLS['testnet']!;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const suiClient = new SuiJsonRpcClient({ url, network }) as any;
+
+  const recovered: RecoveredVault[] = [];
+  const checkedObjectIds = new Set<string>();
+
+  try {
+    let cursor: string | undefined;
+    let hasMore = true;
+
+    while (hasMore) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const page: any = await suiClient.queryTransactionBlocks({
+        filter: { FromAddress: walletAddress },
+        options: { showObjectChanges: true },
+        limit: 50,
+        cursor,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      for (const tx of (page.data ?? []) as any[]) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        for (const change of (tx.objectChanges ?? []) as any[]) {
+          if (
+            change.type === 'created' &&
+            typeof change.objectType === 'string' &&
+            (change.objectType as string).includes('::blob::Blob') &&
+            !checkedObjectIds.has(change.objectId as string)
+          ) {
+            checkedObjectIds.add(change.objectId as string);
+            try {
+              const obj = await suiClient.getObject({
+                id: change.objectId,
+                options: { showContent: true },
+              });
+              const fields = obj?.data?.content?.fields as Record<string, unknown> | undefined;
+              const blobId = fields?.blob_id as string | undefined;
+              if (blobId) {
+                const data = await fetchBlob(blobId);
+                try {
+                  const manifest = parseManifest(data.toString('utf-8'));
+                  if (manifest.ownerAddress === walletAddress) {
+                    recovered.push({ manifest, manifestBlobId: blobId });
+                  }
+                } catch {
+                  // Not a vault manifest — skip
+                }
+              }
+            } catch {
+              // Inaccessible object — skip
+            }
+          }
+        }
+      }
+
+      cursor = page.nextCursor as string | undefined;
+      hasMore = Boolean(page.hasNextPage) && cursor != null;
+    }
+  } catch {
+    // Network or RPC errors — return whatever was found
+  }
+
+  return recovered;
 }
