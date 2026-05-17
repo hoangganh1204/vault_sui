@@ -19,9 +19,9 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project directory structure: src/commands/, src/core/, src/adapters/, src/utils/, tests/core/, tests/commands/, tests/adapters/ per plan.md
-- [ ] T002 Initialize TypeScript project: package.json, tsconfig.json (strict mode, ES2022, NodeNext), install all dependencies (commander@12, @mysten/sui, @mysten/walrus, chalk@5, ora@8, cli-table3, nanoid@5, archiver@7, extract-zip, and devDeps jest@29, ts-jest, @types/node, @types/jest, @types/archiver, eslint, prettier)
-- [ ] T003 [P] Configure Jest (jest.config.ts with ts-jest preset), ESLint (.eslintrc.json with TypeScript strict rules), Prettier (.prettierrc), and add npm scripts: "test", "lint", "build" to package.json
+- [x] T001 Create project directory structure: src/commands/, src/core/, src/adapters/, src/utils/, tests/core/, tests/commands/, tests/adapters/ per plan.md
+- [x] T002 Initialize TypeScript project: package.json, tsconfig.json (strict mode, ES2022, NodeNext), install all dependencies (commander@12, @mysten/sui, @mysten/walrus, chalk@5, ora@8, cli-table3, nanoid@5, archiver@7, extract-zip, and devDeps jest@29, ts-jest, @types/node, @types/jest, @types/archiver, eslint, prettier)
+- [x] T003 [P] Configure Jest (jest.config.ts with ts-jest preset), ESLint (.eslintrc.json with TypeScript strict rules), Prettier (.prettierrc), and add npm scripts: "test", "lint", "build" to package.json
 
 ---
 
@@ -33,30 +33,30 @@
 
 ### Utilities
 
-- [ ] T004 [P] Implement VaultSuiError class with code/message/fix fields and all error codes (E001–E012) as constants in src/utils/errors.ts
-- [ ] T005 [P] TDD: Write tests then implement formatBytes() (human-readable: "2.0 KB", "4.2 MB") and truncateAddress() (0xABC...def) in src/utils/format.ts and tests/core/format.test.ts
-- [ ] T006 [P] TDD: Write tests then implement withRetry() exponential backoff wrapper (MAX_RETRIES=3, BACKOFF_DELAYS=[1000,2000,4000]ms) in src/utils/retry.ts and tests/core/retry.test.ts
-- [ ] T007 [P] Implement centralized logger with header("VaultSui 🔐"), divider, step(), success(), error(), spinner() using chalk+ora+cli-table3 in src/utils/logger.ts
+- [X] T004 [P] Implement VaultSuiError class with code/message/fix fields and all error codes (E001–E012) as constants in src/utils/errors.ts
+- [X] T005 [P] TDD: Write tests then implement formatBytes() (human-readable: "2.0 KB", "4.2 MB") and truncateAddress() (0xABC...def) in src/utils/format.ts and tests/core/format.test.ts
+- [X] T006 [P] TDD: Write tests then implement withRetry() exponential backoff wrapper (MAX_RETRIES=3, BACKOFF_DELAYS=[1000,2000,4000]ms) in src/utils/retry.ts and tests/core/retry.test.ts
+- [X] T007 [P] Implement centralized logger with header("VaultSui 🔐"), divider, step(), success(), error(), spinner() using chalk+ora+cli-table3 in src/utils/logger.ts
 
 ### Core Domain Logic (TDD: write test → fail → implement → pass)
 
-- [ ] T008 [P] TDD: Write tests then implement generateVaultId() ("v_" + nanoid(6)) and validateVaultId() in src/core/vault-id.ts and tests/core/vault-id.test.ts
-- [ ] T009 [P] TDD: Write tests then implement computeChecksum() (SHA-256 hex) and verifyChecksum() in src/core/checksum.ts and tests/core/checksum.test.ts
-- [ ] T010 [P] TDD: Write tests then implement encrypt() and decrypt() using AES-256-GCM with KeyObject wrapping, layout [iv:12|tag:16|ciphertext:N], AAD=vaultId in src/core/encrypt.ts and tests/core/encrypt.test.ts
-- [ ] T011 [P] TDD: Write tests then implement compressFile() (archiver zip/deflate → Buffer) and decompressBuffer() (extract-zip) in src/core/compress.ts and tests/core/compress.test.ts
-- [ ] T012 [P] TDD: Write tests then implement createKeypair() (Ed25519 from private key string), getAddress(), signMessage(), verifySignature(), validateSuiAddress() (regex /^0x[0-9a-fA-F]{64}$/) in src/core/wallet.ts and tests/core/wallet.test.ts
-- [ ] T013 TDD: Write tests then implement createManifest(), parseManifest(), validateManifest() per manifest-schema.md contract (version, vaultId, fileName, checksum, encryptedKeys, allowedWallets, blobId) in src/core/manifest.ts and tests/core/manifest.test.ts
+- [x] T008 [P] TDD: Write tests then implement generateVaultId() ("v_" + nanoid(6)) and validateVaultId() in src/core/vault-id.ts and tests/core/vault-id.test.ts
+- [x] T009 [P] TDD: Write tests then implement computeChecksum() (SHA-256 hex) and verifyChecksum() in src/core/checksum.ts and tests/core/checksum.test.ts
+- [x] T010 [P] TDD: Write tests then implement encrypt() and decrypt() using AES-256-GCM with KeyObject wrapping, layout [iv:12|tag:16|ciphertext:N], AAD=vaultId in src/core/encrypt.ts and tests/core/encrypt.test.ts
+- [x] T011 [P] TDD: Write tests then implement compressFile() (archiver zip/deflate → Buffer) and decompressBuffer() (extract-zip) in src/core/compress.ts and tests/core/compress.test.ts
+- [x] T012 [P] TDD: Write tests then implement createKeypair() (Ed25519 from private key string), getAddress(), signMessage(), verifySignature(), validateSuiAddress() (regex /^0x[0-9a-fA-F]{64}$/) in src/core/wallet.ts and tests/core/wallet.test.ts
+- [x] T013 TDD: Write tests then implement createManifest(), parseManifest(), validateManifest() per manifest-schema.md contract (version, vaultId, fileName, checksum, encryptedKeys, allowedWallets, blobId) in src/core/manifest.ts and tests/core/manifest.test.ts
 
 ### I/O Adapters
 
-- [ ] T014 [P] Implement Walrus adapter: storeBlob() wrapping WalrusClient.writeBlob() and fetchBlob() wrapping readBlob(), with withRetry() wrapper, configure network from env VAULTSUI_NETWORK in src/adapters/walrus.ts
-- [ ] T015 [P] Implement Sui adapter: loadKeypair() from SUI_PRIVATE_KEY env or --wallet-key flag using Ed25519Keypair.fromSecretKey() in src/adapters/sui.ts
-- [ ] T016 [P] Implement filesystem adapter: readFileAsync(), writeFileAsync(), ensureDir() using fs/promises in src/adapters/fs.ts
-- [ ] T017 [P] TDD: Write tests then implement registry adapter: loadRegistry(), saveRegistry(), addVaultEntry(), getVaultEntries() for ~/.vaultsui/vaults.json per VaultRegistry schema in src/adapters/registry.ts and tests/adapters/registry.test.ts
+- [x] T014 [P] Implement Walrus adapter: storeBlob() wrapping WalrusClient.writeBlob() and fetchBlob() wrapping readBlob(), with withRetry() wrapper, configure network from env VAULTSUI_NETWORK in src/adapters/walrus.ts
+- [x] T015 [P] Implement Sui adapter: loadKeypair() from SUI_PRIVATE_KEY env or --wallet-key flag using Ed25519Keypair.fromSecretKey() in src/adapters/sui.ts
+- [x] T016 [P] Implement filesystem adapter: readFileAsync(), writeFileAsync(), ensureDir() using fs/promises in src/adapters/fs.ts
+- [x] T017 [P] TDD: Write tests then implement registry adapter: loadRegistry(), saveRegistry(), addVaultEntry(), getVaultEntries() for ~/.vaultsui/vaults.json per VaultRegistry schema in src/adapters/registry.ts and tests/adapters/registry.test.ts
 
 ### CLI Skeleton
 
-- [ ] T018 Create Commander.js CLI entry point with program name "vault-sui", version, description, global options (--wallet-key, --network), and stub subcommands (push, restore, list, verify) with --help in src/index.ts
+- [x] T018 Create Commander.js CLI entry point with program name "vault-sui", version, description, global options (--wallet-key, --network), and stub subcommands (push, restore, list, verify) with --help in src/index.ts
 
 **Checkpoint**: Foundation ready — all core modules tested, adapters implemented, CLI skeleton wired. User story implementation can now begin.
 

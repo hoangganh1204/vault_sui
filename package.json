@@ -1,0 +1,53 @@
+{
+  "name": "vault-sui",
+  "version": "0.1.0",
+  "description": "Decentralized sensitive data vault powered by Sui and Walrus",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "vault-sui": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "lint": "eslint 'src/**/*.ts' 'tests/**/*.ts'",
+    "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "sui",
+    "walrus",
+    "vault",
+    "encryption",
+    "decentralized",
+    "cli"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@mysten/sui": "^2.16.3",
+    "@mysten/walrus": "^1.1.7",
+    "archiver": "^7.0.1",
+    "chalk": "^5.6.2",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "extract-zip": "^2.0.1",
+    "nanoid": "^5.1.11",
+    "ora": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/archiver": "^7.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.8.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.3",
+    "@typescript-eslint/parser": "^8.59.3",
+    "cross-env": "^10.1.0",
+    "eslint": "^8.57.1",
+    "jest": "^29.7.0",
+    "prettier": "^3.8.3",
+    "ts-jest": "^29.4.9",
+    "typescript": "^5.9.3"
+  }
+}
