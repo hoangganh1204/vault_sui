@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import { pushCommand } from './commands/push.js';
 import { restoreCommand } from './commands/restore.js';
 import { listCommand } from './commands/list.js';
+import { verifyCommand } from './commands/verify.js';
 import * as logger from './utils/logger.js';
 import { formatBytes, truncateAddress } from './utils/format.js';
 import type { VaultSuiError } from './utils/errors.js';
@@ -98,8 +99,31 @@ program
 program
   .command('verify <vault-id>')
   .description('Verify the integrity and availability of a vault on Walrus')
-  .action((_vaultId: string) => {
-    // TODO: implement in Phase 6
+  .action(async (vaultId: string) => {
+    logger.header();
+    const parentOpts = program.opts() as { walletKey?: string };
+    try {
+      const result = await verifyCommand(vaultId, { walletKey: parentOpts.walletKey });
+      if (result.status === 'healthy') {
+        const expiresDate = result.expiresAt.split('T')[0] ?? result.expiresAt;
+        logger.success('Vault is healthy', {
+          'Vault ID': result.vaultId,
+          File: result.fileName,
+          Size: formatBytes(result.fileSize),
+          Created: result.createdAt.split('T')[0] ?? result.createdAt,
+          Expires: expiresDate,
+        });
+      } else {
+        const e = result.error as VaultSuiError | undefined;
+        logger.error('Vault is corrupted', e?.code ? e : undefined);
+      }
+      logger.divider();
+    } catch (err) {
+      const e = err as VaultSuiError;
+      logger.error('Verify failed', e.code ? e : undefined);
+      logger.divider();
+      process.exit(1);
+    }
   });
 
 program.parse(process.argv);
