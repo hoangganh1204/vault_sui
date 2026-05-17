@@ -97,7 +97,7 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T022 [P] [US2] Write restore command tests in tests/commands/restore.test.ts:
+- [x] T022 [P] [US2] Write restore command tests in tests/commands/restore.test.ts:
   - Happy path: restore with authorized wallet → file written to --output dir, checksum matches
   - Error: unauthorized wallet → throws VaultSuiError E004 BEFORE downloading blob
   - Error: vault not found → throws VaultSuiError E007
@@ -105,8 +105,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T023 [US2] Implement restore command handler in src/commands/restore.ts: validate inputs (vaultId format, wallet configured) → fetchBlob (manifest) → parseManifest → check wallet in allowedWallets (reject E004 before blob download) → unwrap AES key via X25519 ECDH → fetchBlob (encrypted data) → decrypt → decompressBuffer → verifyChecksum (reject E009 if mismatch, do NOT write to disk) → writeFile → output success with logger
-- [ ] T024 [US2] Wire restore command into CLI in src/index.ts: `program.command("restore <vault-id>")` with --output option per cli-commands.md contract
+- [x] T023 [US2] Implement restore command handler in src/commands/restore.ts: validate inputs (vaultId format, wallet configured) → fetchBlob (manifest) → parseManifest → check wallet in allowedWallets (reject E004 before blob download) → unwrap AES key via X25519 ECDH → fetchBlob (encrypted data) → decrypt → decompressBuffer → verifyChecksum (reject E009 if mismatch, do NOT write to disk) → writeFile → output success with logger
+- [x] T024 [US2] Wire restore command into CLI in src/index.ts: `program.command("restore <vault-id>")` with --output option per cli-commands.md contract
 
 **Checkpoint**: `vault-sui restore v_XXXXXX --output ./restored/` should work. Full push→restore cycle functional.
 

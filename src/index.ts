@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { pushCommand } from './commands/push.js';
+import { restoreCommand } from './commands/restore.js';
 import * as logger from './utils/logger.js';
-import { formatBytes } from './utils/format.js';
-import { truncateAddress } from './utils/format.js';
+import { formatBytes, truncateAddress } from './utils/format.js';
 import type { VaultSuiError } from './utils/errors.js';
 
 const program = new Command();
@@ -33,7 +33,7 @@ program
       const expiresDate = result.expiresAt.split('T')[0] ?? result.expiresAt;
       logger.success('Vault created successfully', {
         'Vault ID': result.vaultId,
-        File: `${result.fileName}`,
+        File: result.fileName,
         Size: `${formatBytes(result.fileSize)} → ${formatBytes(result.compressedSize)}`,
         Owner: truncateAddress(result.ownerAddress),
         Recipients: String(result.allowedWallets.length),
@@ -52,8 +52,28 @@ program
   .command('restore <vault-id>')
   .description('Download and decrypt a vault to your local machine')
   .option('--output <dir>', 'Output directory for the restored file', '.')
-  .action((_vaultId: string, _opts: { output: string }) => {
-    // TODO: implement in Phase 4
+  .action(async (vaultId: string, opts: { output: string }) => {
+    logger.header();
+    const parentOpts = program.opts() as { walletKey?: string };
+    try {
+      const result = await restoreCommand(vaultId, {
+        walletKey: parentOpts.walletKey,
+        output: opts.output,
+      });
+
+      logger.success('Vault restored successfully', {
+        File: result.fileName,
+        Size: formatBytes(result.fileSize),
+        Location: result.outputPath,
+        Checksum: result.checksum.slice(0, 16) + '...',
+      });
+      logger.divider();
+    } catch (err) {
+      const e = err as VaultSuiError;
+      logger.error('Restore failed', e.code ? e : undefined);
+      logger.divider();
+      process.exit(1);
+    }
   });
 
 program
