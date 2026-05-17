@@ -72,7 +72,7 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T019 [P] [US1] Write push command tests in tests/commands/push.test.ts:
+- [x] T019 [P] [US1] Write push command tests in tests/commands/push.test.ts:
   - Happy path: push file with valid wallet → returns vault ID, calls compress→encrypt→storeBlob→saveRegistry
   - Error: wallet not configured → throws VaultSuiError E002
   - Error: invalid recipient address → throws VaultSuiError E003
@@ -80,8 +80,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T020 [US1] Implement push command handler in src/commands/push.ts: validate inputs (file exists, wallet configured, addresses valid) → readFile → computeChecksum → compressFile → generate AES key → encrypt (with AAD=vaultId) → wrap key per wallet (owner + recipients via X25519 ECDH) → createManifest → storeBlob (data) → storeBlob (manifest) → addVaultEntry to registry → output success with logger
-- [ ] T021 [US1] Wire push command into CLI in src/index.ts: `program.command("push <path>")` with --allow and --epochs options per cli-commands.md contract
+- [x] T020 [US1] Implement push command handler in src/commands/push.ts: validate inputs (file exists, wallet configured, addresses valid) → readFile → computeChecksum → compressFile → generate AES key → encrypt (with AAD=vaultId) → wrap key per wallet (owner + recipients via X25519 ECDH) → createManifest → storeBlob (data) → storeBlob (manifest) → addVaultEntry to registry → output success with logger
+- [x] T021 [US1] Wire push command into CLI in src/index.ts: `program.command("push <path>")` with --allow and --epochs options per cli-commands.md contract
 
 **Checkpoint**: `vault-sui push .env --allow 0x...` should work end-to-end. Owner can backup a file.
 

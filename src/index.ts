@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
+import { pushCommand } from './commands/push.js';
+import * as logger from './utils/logger.js';
+import { formatBytes } from './utils/format.js';
+import { truncateAddress } from './utils/format.js';
+import type { VaultSuiError } from './utils/errors.js';
 
 const program = new Command();
 
@@ -13,13 +18,34 @@ program
 program
   .command('push <path>')
   .description('Encrypt and upload a file to Walrus')
-  .option(
-    '--allow <addresses...>',
-    'Authorized recipient wallet addresses (in addition to owner)'
-  )
+  .option('--allow <addresses...>', 'Authorized recipient wallet addresses (in addition to owner)')
   .option('--epochs <number>', 'Number of Walrus storage epochs', '3')
-  .action((_path: string, _opts: { allow?: string[]; epochs: string }) => {
-    // TODO: implement in Phase 3
+  .action(async (filePath: string, opts: { allow?: string[]; epochs: string }) => {
+    logger.header();
+    const parentOpts = program.opts() as { walletKey?: string; network?: string };
+    try {
+      const result = await pushCommand(filePath, {
+        walletKey: parentOpts.walletKey,
+        allow: opts.allow,
+        epochs: parseInt(opts.epochs, 10),
+      });
+
+      const expiresDate = result.expiresAt.split('T')[0] ?? result.expiresAt;
+      logger.success('Vault created successfully', {
+        'Vault ID': result.vaultId,
+        File: `${result.fileName}`,
+        Size: `${formatBytes(result.fileSize)} → ${formatBytes(result.compressedSize)}`,
+        Owner: truncateAddress(result.ownerAddress),
+        Recipients: String(result.allowedWallets.length),
+        Expires: expiresDate,
+      });
+      logger.divider();
+    } catch (err) {
+      const e = err as VaultSuiError;
+      logger.error('Push failed', e.code ? e : undefined);
+      logger.divider();
+      process.exit(1);
+    }
   });
 
 program
