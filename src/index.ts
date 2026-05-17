@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import { pushCommand } from './commands/push.js';
 import { restoreCommand } from './commands/restore.js';
+import { listCommand } from './commands/list.js';
 import * as logger from './utils/logger.js';
 import { formatBytes, truncateAddress } from './utils/format.js';
 import type { VaultSuiError } from './utils/errors.js';
@@ -80,8 +81,18 @@ program
   .command('list')
   .description('List all vaults in your local registry')
   .option('--json', 'Output raw JSON instead of a table')
-  .action((_opts: { json?: boolean }) => {
-    // TODO: implement in Phase 5
+  .action(async (opts: { json?: boolean }) => {
+    logger.header();
+    const parentOpts = program.opts() as { walletKey?: string };
+    try {
+      await listCommand({ walletKey: parentOpts.walletKey, json: opts.json });
+      logger.divider();
+    } catch (err) {
+      const e = err as VaultSuiError;
+      logger.error('List failed', e.code ? e : undefined);
+      logger.divider();
+      process.exit(1);
+    }
   });
 
 program

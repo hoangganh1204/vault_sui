@@ -122,7 +122,7 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T025 [P] [US3] Write list command tests in tests/commands/list.test.ts:
+- [x] T025 [P] [US3] Write list command tests in tests/commands/list.test.ts:
   - Happy path: list with 3 vaults → displays table with vault_id, fileName, fileSize (human-readable), createdAt, status
   - Error: no vaults → displays "No vaults found" message with hint
   - Error: wallet not configured → throws VaultSuiError E002
@@ -130,8 +130,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Implement list command handler in src/commands/list.ts: validate wallet configured → loadRegistry() → format table using cli-table3 with columns (ID, File, Size, Created, Status) → support --json flag for raw JSON output → output via logger
-- [ ] T027 [US3] Wire list command into CLI in src/index.ts: `program.command("list")` with --json option per cli-commands.md contract
+- [x] T026 [US3] Implement list command handler in src/commands/list.ts: validate wallet configured → loadRegistry() → format table using cli-table3 with columns (ID, File, Size, Created, Status) → support --json flag for raw JSON output → output via logger
+- [x] T027 [US3] Wire list command into CLI in src/index.ts: `program.command("list")` with --json option per cli-commands.md contract
 
 **Checkpoint**: `vault-sui list` should display all vaults in < 1 second.
 
